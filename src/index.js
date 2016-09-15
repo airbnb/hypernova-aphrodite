@@ -13,14 +13,14 @@ export const renderReactWithAphrodite = (name, component) => hypernova({
 
       const style = `<style data-aphrodite>${css.content}</style>`;
       const markup = serialize(name, html, props);
-      const classNames = toScript('aphrodite-css', name, css.renderedClassNames);
+      const classNames = toScript({ 'aphrodite-css': name }, css.renderedClassNames);
 
       return `${style}\n${markup}\n${classNames}`;
     };
   },
 
   client() {
-    const classNames = fromScript('aphrodite-css', name);
+    const classNames = fromScript({ 'aphrodite-css': name });
     if (classNames) StyleSheet.rehydrate(classNames);
 
     const { node, data } = load(name);
