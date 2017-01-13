@@ -31,3 +31,7 @@ Button.propTypes = {
   onPress: PropTypes.func,
   children: PropTypes.node,
 };
+Button.defaultProps = {
+  onPress() {},
+  children: null,
+};

@@ -1,14 +1,15 @@
-import AphroditeComponent from './components/AphroditeComponent';
-import { renderReactWithAphrodite } from '../';
 import jsdom from 'jsdom';
 import { assert } from 'chai';
+
+import AphroditeComponent from './components/AphroditeComponent';
+import { renderReactWithAphrodite } from '../';
 
 describe('aphrodite css rendering', () => {
   let result;
   beforeEach(() => {
     result = renderReactWithAphrodite('AC', AphroditeComponent)({
       children: ['Zack'],
-      onPress: () => alert('Clicked'),
+      onPress() { console.log('Clicked'); },
     });
   });
 

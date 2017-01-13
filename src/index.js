@@ -4,6 +4,7 @@ import ReactDOMServer from 'react-dom/server';
 import hypernova, { serialize, load, toScript, fromScript } from 'hypernova';
 import { StyleSheet, StyleSheetServer } from 'aphrodite';
 
+/* eslint import/prefer-default-export: 1 */
 export const renderReactWithAphrodite = (name, component) => hypernova({
   server() {
     return (props) => {
