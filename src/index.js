@@ -24,11 +24,15 @@ export const renderReactWithAphrodite = (name, component) => hypernova({
     const classNames = fromScript({ 'aphrodite-css': name });
     if (classNames) StyleSheet.rehydrate(classNames);
 
-    const { node, data } = load(name);
-
-    if (node) {
-      const element = React.createElement(component, data);
-      ReactDOM.render(element, node);
+    const payloads = load(name);
+    if (payloads) {
+      payloads.forEach((payload) => {
+        const { node, data } = payload;
+        if (node) {
+          const element = React.createElement(component, data);
+          ReactDOM.render(element, node);
+        }
+      });
     }
 
     return component;
