@@ -12,8 +12,12 @@ export const renderReactWithAphrodite = (name, component) => hypernova({
         ReactDOMServer.renderToString(React.createElement(component, props))
       ));
 
+      // We don't want to serialize the serverOnlyData
+      const propsToSerialize = { ...props };
+      delete propsToSerialize.serverOnlyData;
+
       const style = `<style data-aphrodite>${css.content}</style>`;
-      const markup = serialize(name, html, props);
+      const markup = serialize(name, html, propsToSerialize);
       const classNames = toScript({ 'aphrodite-css': name }, css.renderedClassNames);
 
       return `${style}\n${markup}\n${classNames}`;
