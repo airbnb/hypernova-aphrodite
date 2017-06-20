@@ -4,7 +4,6 @@ import ReactDOMServer from 'react-dom/server';
 import hypernova, { serialize, load, toScript, fromScript } from 'hypernova';
 import { StyleSheet, StyleSheetServer } from 'aphrodite';
 
-/* eslint import/prefer-default-export: 1 */
 export const renderReactWithAphrodite = (name, component) => hypernova({
   server() {
     return (props) => {
@@ -37,4 +36,20 @@ export const renderReactWithAphrodite = (name, component) => hypernova({
 
     return component;
   },
+});
+
+export const renderReactWithAphroditeStatic = (name, component) => hypernova({
+  server() {
+    return (props) => {
+      const { html, css } = StyleSheetServer.renderStatic(() => (
+        ReactDOMServer.renderToStaticMarkup(React.createElement(component, props))
+      ));
+
+      const style = `<style data-aphrodite>${css.content}</style>`;
+
+      return `${style}\n${html}`;
+    };
+  },
+
+  client() {},
 });
