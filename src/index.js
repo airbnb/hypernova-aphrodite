@@ -11,7 +11,7 @@ export const renderReactWithAphrodite = (name, component) => hypernova({
         ReactDOMServer.renderToString(React.createElement(component, props))
       ));
 
-      const style = `<style data-aphrodite>${css.content}</style>`;
+      const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
       const markup = serialize(name, html, props);
       const classNames = toScript({ 'aphrodite-css': name }, css.renderedClassNames);
 
@@ -45,7 +45,7 @@ export const renderReactWithAphroditeStatic = (name, component) => hypernova({
         ReactDOMServer.renderToStaticMarkup(React.createElement(component, props))
       ));
 
-      const style = `<style data-aphrodite>${css.content}</style>`;
+      const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
 
       return `${style}\n${html}`;
     };
