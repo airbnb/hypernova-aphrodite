@@ -5,12 +5,17 @@
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "rimraf lib && babel src -d lib",
+    "clean": "rimraf lib coverage",
+    "prebuild": "npm run clean",
+    "build": "babel src -d lib",
     "lint": "eslint --ext=js,jsx src test",
-    "test": "npm run lint && npm run build && npm run test:coverage",
-    "tests-only": "npm run build && npm run test:quick",
-    "test:coverage": "babel-node node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -R tap test/*-test.js",
-    "test:quick": "babel-node node_modules/.bin/_mocha -R tap test/*-test.js"
+    "pretest": "npm run lint",
+    "test": "npm run coverage",
+    "tests-only": "npm run test:quick",
+    "precoverage": "npm run build",
+    "coverage": "babel-node \"$(which istanbul)\" cover \"$(which _mocha)\" -- -R tap test/*-test.js",
+    "pretest:quick": "npm run build",
+    "test:quick": "babel-node \"$(which _mocha)\" -R tap test/*-test.js"
   },
   "repository": {
     "type": "git",
