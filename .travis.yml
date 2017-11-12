@@ -22,7 +22,7 @@ env:
 matrix:
   fast_finish: true
   include:
-    - node_js: "node"
+    - node_js: "lts/*"
       env: PRETEST=true
     - node_js: "4"
       env: COVERAGE=true
