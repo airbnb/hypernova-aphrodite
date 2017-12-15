@@ -1,5 +1,8 @@
 import jsdom from 'jsdom';
 import { assert } from 'chai';
+import sinon from 'sinon';
+import ReactDOM from 'react-dom';
+import ifReact from 'enzyme-adapter-react-helper/build/ifReact';
 
 import AphroditeComponent from './components/AphroditeComponent';
 import withHOC from './components/withHOC';
@@ -36,7 +39,7 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
     assert.ok(/data-aphrodite-css/.test(result));
   });
 
-  it('does not blow up when calling renderReactWithAphrodite on the client', (done) => {
+  ifReact('>= 16', it, it.skip)('does not blow up when calling renderReactWithAphrodite on the client', (done) => {
     jsdom.env(result, (err, window) => {
       if (err) {
         done(err);
@@ -46,7 +49,46 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
       global.window = window;
       global.document = window.document;
 
+      const hydrateMethod = sinon.spy(ReactDOM, 'hydrate');
+
       renderReactWithAphrodite('AC', AphroditeComponent);
+
+      assert(hydrateMethod.calledOnce);
+
+      delete global.window;
+      delete global.document;
+
+      hydrateMethod.restore();
+
+      done();
+    });
+  });
+
+  it('does not blow up when calling renderReactWithAphrodite on the client (render method)', (done) => {
+    jsdom.env(result, (err, window) => {
+      if (err) {
+        done(err);
+        return;
+      }
+
+      global.window = window;
+      global.document = window.document;
+
+      const sandbox = sinon.createSandbox();
+      if (ReactDOM.hydrate) {
+        sandbox.stub(ReactDOM, 'hydrate').value(undefined);
+      }
+
+      const renderMethod = sinon.spy(ReactDOM, 'render');
+
+      renderReactWithAphrodite('AC', AphroditeComponent);
+
+      assert(renderMethod.calledOnce);
+
+      sandbox.restore();
+
+      delete global.window;
+      delete global.document;
 
       done();
     });
