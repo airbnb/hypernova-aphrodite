@@ -12,7 +12,7 @@ export const setRenderEnhancers = (...enhancers) => {
   config.enhancers = enhancers.filter(hoc => typeof hoc === 'function'); // clear & set
 };
 
-const enhance = component => config.enhancers.reverse().reduce((x, f) => f(x), component);
+const enhance = component => config.enhancers.reduceRight((x, f) => f(x), component);
 
 export const renderReactWithAphrodite = (name, component) => {
   const enhancedComponent = enhance(component);
