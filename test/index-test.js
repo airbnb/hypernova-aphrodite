@@ -2,7 +2,12 @@ import jsdom from 'jsdom';
 import { assert } from 'chai';
 
 import AphroditeComponent from './components/AphroditeComponent';
-import { renderReactWithAphrodite, renderReactWithAphroditeStatic } from '../';
+import withHOC from './components/withHOC';
+import {
+  renderReactWithAphrodite,
+  renderReactWithAphroditeStatic,
+  setRenderEnhancers,
+} from '../';
 
 describe('renderReactWithAphrodite aphrodite css rendering', () => {
   let originalWindow;
@@ -96,5 +101,47 @@ describe('renderReactWithAphroditeStatic static aphrodite css rendering', () => 
         done();
       });
     });
+  });
+});
+
+describe('setRenderEnhancers', () => {
+  afterEach(() => {
+    setRenderEnhancers(); // reset
+  });
+
+  it('works with no enhancers', () => {
+    setRenderEnhancers();
+
+    const result = renderReactWithAphrodite('AC', AphroditeComponent)({});
+
+    assert.isString(result);
+  });
+
+  it('works with one enhancer', () => {
+    const enhancers = [withHOC];
+    setRenderEnhancers(...enhancers);
+
+    const result = renderReactWithAphrodite('AC', AphroditeComponent)({});
+
+    assert.isString(result);
+    assert.lengthOf(result.match(/class="hoc"/g), enhancers.length);
+  });
+
+  it('works with multiple enhancers', () => {
+    const enhancers = [withHOC, withHOC, withHOC, withHOC];
+    setRenderEnhancers(...enhancers);
+
+    const result = renderReactWithAphrodite('AC', AphroditeComponent)({});
+
+    assert.isString(result);
+    assert.lengthOf(result.match(/class="hoc"/g), enhancers.length);
+  });
+
+  it('throws when passed enhancers that are not functions', () => {
+    const goodEnhancers = [withHOC];
+    assert.doesNotThrow(setRenderEnhancers.bind(this, ...goodEnhancers), TypeError);
+
+    const badEnhancers = ['not a function'];
+    assert.throws(setRenderEnhancers.bind(this, ...badEnhancers), TypeError);
   });
 });

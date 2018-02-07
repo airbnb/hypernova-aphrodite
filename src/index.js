@@ -4,52 +4,77 @@ import ReactDOMServer from 'react-dom/server';
 import hypernova, { serialize, load, toScript, fromScript } from 'hypernova';
 import { StyleSheet, StyleSheetServer } from 'aphrodite';
 
-export const renderReactWithAphrodite = (name, component) => hypernova({
-  server() {
-    return (props) => {
-      const { html, css } = StyleSheetServer.renderStatic(() => (
-        ReactDOMServer.renderToString(React.createElement(component, props))
-      ));
+const config = {
+  enhancers: [], // HOCs applied to the component before render: e0(e1(e2(...en(component))))
+};
 
-      const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
-      const markup = serialize(name, html, props);
-      const classNames = toScript({ 'aphrodite-css': name }, css.renderedClassNames);
-
-      return `${style}\n${markup}\n${classNames}`;
-    };
-  },
-
-  client() {
-    const classNames = fromScript({ 'aphrodite-css': name });
-    if (classNames) StyleSheet.rehydrate(classNames);
-
-    const payloads = load(name);
-    if (payloads) {
-      payloads.forEach((payload) => {
-        const { node, data } = payload;
-        if (node) {
-          const element = React.createElement(component, data);
-          ReactDOM.render(element, node);
-        }
-      });
+export const setRenderEnhancers = (...enhancers) => {
+  // Check that all enhancers are functions
+  enhancers.forEach((enhancer, index) => {
+    if (typeof enhancer !== 'function') {
+      throw new TypeError(`enhancers passed to setRenderEnhancer should be functions: ${index}`);
     }
+  });
 
-    return component;
-  },
-});
+  config.enhancers = enhancers; // clear & set
+};
 
-export const renderReactWithAphroditeStatic = (name, component) => hypernova({
-  server() {
-    return (props) => {
-      const { html, css } = StyleSheetServer.renderStatic(() => (
-        ReactDOMServer.renderToStaticMarkup(React.createElement(component, props))
-      ));
+const enhance = component => config.enhancers.reduceRight((x, f) => f(x), component);
 
-      const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
+export const renderReactWithAphrodite = (name, component) => {
+  const enhancedComponent = enhance(component);
+  return hypernova({
+    server() {
+      return (props) => {
+        const { html, css } = StyleSheetServer.renderStatic(() => {
+          const element = React.createElement(enhancedComponent, props);
+          return ReactDOMServer.renderToString(element);
+        });
 
-      return `${style}\n${html}`;
-    };
-  },
+        const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
+        const markup = serialize(name, html, props);
+        const classNames = toScript({ 'aphrodite-css': name }, css.renderedClassNames);
 
-  client() {},
-});
+        return `${style}\n${markup}\n${classNames}`;
+      };
+    },
+
+    client() {
+      const classNames = fromScript({ 'aphrodite-css': name });
+      if (classNames) StyleSheet.rehydrate(classNames);
+
+      const payloads = load(name);
+      if (payloads) {
+        payloads.forEach((payload) => {
+          const { node, data } = payload;
+          if (node) {
+            const element = React.createElement(enhancedComponent, data);
+            ReactDOM.render(element, node);
+          }
+        });
+      }
+
+      return component;
+    },
+  });
+};
+
+export const renderReactWithAphroditeStatic = (name, component) => {
+  const enhancedComponent = enhance(component);
+  return hypernova({
+    server() {
+      return (props) => {
+        const { html, css } = StyleSheetServer.renderStatic(() => {
+          const element = React.createElement(enhancedComponent, props);
+          return ReactDOMServer.renderToStaticMarkup(element);
+        });
+
+        const style = `<style data-aphrodite="data-aphrodite">${css.content}</style>`;
+
+        return `${style}\n${html}`;
+      };
+    },
+
+    client() {},
+  });
+};
