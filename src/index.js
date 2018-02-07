@@ -9,7 +9,14 @@ const config = {
 };
 
 export const setRenderEnhancers = (...enhancers) => {
-  config.enhancers = enhancers.filter(hoc => typeof hoc === 'function'); // clear & set
+  // Check that all enhancers are functions
+  enhancers.forEach((enhancer, index) => {
+    if (typeof enhancer !== 'function') {
+      throw new TypeError(`enhancers passed to setRenderEnhancer should be functions: ${index}`);
+    }
+  });
+
+  config.enhancers = enhancers; // clear & set
 };
 
 const enhance = component => config.enhancers.reduceRight((x, f) => f(x), component);

@@ -136,4 +136,12 @@ describe('setRenderEnhancers', () => {
     assert.isString(result);
     assert.lengthOf(result.match(/class="hoc"/g), enhancers.length);
   });
+
+  it('throws when passed enhancers that are not functions', () => {
+    const goodEnhancers = [withHOC];
+    assert.doesNotThrow(setRenderEnhancers.bind(this, ...goodEnhancers), TypeError);
+
+    const badEnhancers = ['not a function'];
+    assert.throws(setRenderEnhancers.bind(this, ...badEnhancers), TypeError);
+  });
 });
