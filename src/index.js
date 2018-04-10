@@ -49,7 +49,11 @@ export const renderReactWithAphrodite = (name, component) => {
           const { node, data } = payload;
           if (node) {
             const element = React.createElement(enhancedComponent, data);
-            ReactDOM.render(element, node);
+            if (ReactDOM.hydrate) {
+              ReactDOM.hydrate(element, node);
+            } else {
+              ReactDOM.render(element, node);
+            }
           }
         });
       }
