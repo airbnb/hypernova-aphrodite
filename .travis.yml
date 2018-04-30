@@ -3,22 +3,25 @@ os:
  - linux
 node_js:
   - "10"
-  - "9"
   - "8"
-  - "7"
   - "6"
-  - "5"
   - "4"
 before_install:
   - 'nvm install-latest-npm'
+install:
+  - 'npm install'
+  - 'if [ -n "${APHRODITE-}" ]; then npm install "aphrodite@${APHRODITE}" ; fi'
+  - 'npm ls >/dev/null'
 script:
   - 'if [ -n "${PRETEST-}" ]; then npm run pretest ; fi'
   - 'if [ -n "${POSTTEST-}" ]; then npm run posttest ; fi'
   - 'if [ -n "${COVERAGE-}" ]; then npm run coverage ; fi'
-  - 'if [ -n "${TEST-}" ]; then npm run tests-only ; fi'
+  - 'if [ -n "${APHRODITE-}" ]; then npm run tests-only ; fi'
 sudo: false
 env:
-  - TEST=true
+  - APHRODITE=2
+  - APHRODITE=1
+  - APHRODITE=0.4
 matrix:
   fast_finish: true
   include:
@@ -28,4 +31,3 @@ matrix:
       env: COVERAGE=true
   allow_failures:
     - os: osx
-    - env: TEST=true ALLOW_FAILURE=true

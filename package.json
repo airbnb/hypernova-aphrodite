@@ -50,14 +50,15 @@
     "hypernova": "^2.0.0",
     "react": "0.14.x || >= 15.x",
     "react-dom": "0.14.x || >= 15.x",
-    "aphrodite": "^0.4.0 || ^1.1.0"
+    "aphrodite": "^0.4.0 || ^1.1.0 || ^2"
   },
   "devDependencies": {
-    "aphrodite": "^1.2.5",
+    "aphrodite": "^0.4.0 || ^1.1.0 || ^2",
     "babel-cli": "^6.26.0",
     "babel-preset-airbnb": "^2.4.0",
     "chai": "^4.1.2",
     "enzyme-adapter-react-helper": "^1.2.3",
+    "enzyme": "^3.0.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.11.0",
