@@ -1,7 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
-import hypernova, { serialize, load, toScript, fromScript } from 'hypernova';
+import hypernova, {
+  serialize,
+  load,
+  toScript,
+  fromScript,
+} from 'hypernova';
 import { StyleSheet, StyleSheetServer } from 'aphrodite';
 
 const config = {

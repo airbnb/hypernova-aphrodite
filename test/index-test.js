@@ -10,7 +10,7 @@ import {
   renderReactWithAphrodite,
   renderReactWithAphroditeStatic,
   setRenderEnhancers,
-} from '../';
+} from '..';
 
 describe('renderReactWithAphrodite aphrodite css rendering', () => {
   let originalWindow;
