@@ -3,6 +3,7 @@
   "version": "2.3.0",
   "description": "Aphrodite bindings for Hypernova",
   "main": "lib/index.js",
+  "browser": "lib/index.browser.js",
   "scripts": {
     "prepublish": "npm run build",
     "clean": "rimraf lib coverage",
