@@ -6,9 +6,13 @@ import ifReact from 'enzyme-adapter-react-helper/build/ifReact';
 
 import AphroditeComponent from './components/AphroditeComponent';
 import {
+  renderReactWithAphrodite as serverRenderReactWithAphrodite,
+  renderReactWithAphroditeStatic as serverRenderReactWithAphroditeStatic,
+} from '..';
+import {
   renderReactWithAphrodite,
   renderReactWithAphroditeStatic,
-} from '..';
+} from '../lib/index.browser';
 
 describe('renderReactWithAphrodite aphrodite css rendering', () => {
   let originalWindow;
@@ -18,7 +22,7 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
   beforeEach(() => {
     originalWindow = global.window;
     originalDocument = global.document;
-    result = renderReactWithAphrodite('AC', AphroditeComponent)({
+    result = serverRenderReactWithAphrodite('AC', AphroditeComponent)({
       children: ['Zack'],
       onPress() { console.log('Clicked'); },
     });
@@ -37,7 +41,11 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
     assert.ok(/data-aphrodite-css/.test(result));
   });
 
-  ifReact('>= 16', it, it.skip)('blows up when calling renderReactWithAphrodite on the client', (done) => {
+  it('throws when calling renderReactWithAphrodite on the server', () => {
+    assert.throws(() => renderReactWithAphrodite('AC', AphroditeComponent)(), 'functionality does not work');
+  });
+
+  ifReact('>= 16', it, it.skip)('does not blow up when calling renderReactWithAphrodite on the client', (done) => {
     jsdom.env(result, (err, window) => {
       if (err) {
         done(err);
@@ -47,17 +55,22 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
       global.window = window;
       global.document = window.document;
 
+      const hydrateMethod = sinon.spy(ReactDOM, 'hydrate');
 
-      assert.throws(() => renderReactWithAphrodite('AC', AphroditeComponent));
+      renderReactWithAphrodite('AC', AphroditeComponent);
+
+      assert(hydrateMethod.calledOnce);
 
       delete global.window;
       delete global.document;
+
+      hydrateMethod.restore();
 
       done();
     });
   });
 
-  it('blows up when calling renderReactWithAphrodite on the client (render method)', (done) => {
+  it('does not blow up when calling renderReactWithAphrodite on the client (render method)', (done) => {
     jsdom.env(result, (err, window) => {
       if (err) {
         done(err);
@@ -72,7 +85,11 @@ describe('renderReactWithAphrodite aphrodite css rendering', () => {
         sandbox.stub(ReactDOM, 'hydrate').value(undefined);
       }
 
-      assert.throws(() => renderReactWithAphrodite('AC', AphroditeComponent));
+      const renderMethod = sinon.spy(ReactDOM, 'render');
+
+      renderReactWithAphrodite('AC', AphroditeComponent);
+
+      assert(renderMethod.calledOnce);
 
       sandbox.restore();
 
@@ -92,7 +109,7 @@ describe('renderReactWithAphroditeStatic static aphrodite css rendering', () => 
   beforeEach(() => {
     originalWindow = global.window;
     originalDocument = global.document;
-    result = renderReactWithAphroditeStatic('AC', AphroditeComponent)({
+    result = serverRenderReactWithAphroditeStatic('AC', AphroditeComponent)({
       children: ['Steven'],
       onPress() {},
     });
@@ -103,34 +120,19 @@ describe('renderReactWithAphroditeStatic static aphrodite css rendering', () => 
     global.document = originalDocument;
   });
 
-  describe('on the server', () => {
-    it('the output contains styles and component content', () => {
-      assert.isString(result);
+  it('returns nothing', (done) => {
+    jsdom.env(result, (err, window) => {
+      if (err) {
+        done(err);
+        return;
+      }
 
-      assert.ok(/style data-aphrodite/.test(result));
-      assert.ok(/Steven/.test(result));
-    });
+      global.window = window;
+      global.document = window.document;
 
-    it('the markup does not contain aphrodite-css info for the client', () => {
-      assert.isFalse(/data-aphrodite-css/.test(result));
-    });
-  });
+      assert.isUndefined(renderReactWithAphroditeStatic('AC', AphroditeComponent));
 
-  describe('on the client', () => {
-    it('throws', (done) => {
-      jsdom.env(result, (err, window) => {
-        if (err) {
-          done(err);
-          return;
-        }
-
-        global.window = window;
-        global.document = window.document;
-
-        assert.throws(() => renderReactWithAphroditeStatic('AC', AphroditeComponent), 'functionality does not work');
-
-        done();
-      });
+      done();
     });
   });
 });
