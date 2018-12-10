@@ -1,6 +1,6 @@
 {
   "name": "hypernova-aphrodite",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "Aphrodite bindings for Hypernova",
   "main": "lib/index.js",
   "browser": "lib/index.browser.js",
