@@ -72,7 +72,7 @@
     "prop-types": "^15.6.2",
     "react": "^15 || ^16",
     "react-dom": "^15 || ^16",
-    "rimraf": "^2.6.2",
+    "rimraf": "^3.0.2",
     "sinon": "^5.1.1"
   },
   "greenkeeper": {
